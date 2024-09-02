@@ -1,7 +1,8 @@
 import json
 import os
 import sip  # Импортируем библиотеку sip для управления объектами Qt
-from PyQt5.QtWidgets import QWidget, QPushButton, QMenu, QMessageBox, QInputDialog, QVBoxLayout, QLabel, QFileDialog, QHBoxLayout
+from PyQt5.QtWidgets import (QWidget, QPushButton, QMenu, QMessageBox, 
+                             QInputDialog, QVBoxLayout, QLabel, QFileDialog, QHBoxLayout)
 from PyQt5.QtCore import Qt, QPoint
 
 class DesktopIcon(QPushButton):
@@ -15,61 +16,61 @@ class DesktopIcon(QPushButton):
         self.oldPos = self.pos()  # Сохраняем начальную позицию для перетаскивания
 
     def openMenu(self, position):
-        menu = QMenu()
-        menu.addAction('Открыть', self.open)
-        menu.addAction('Переименовать', self.rename)
-        menu.addAction('Удалить', self.delete)
-        menu.exec_(self.mapToGlobal(position))
+        menu = QMenu()  # Создаем контекстное меню
+        menu.addAction('Открыть', self.open)  # Добавляем действие "Открыть"
+        menu.addAction('Переименовать', self.rename)  # Добавляем действие "Переименовать"
+        menu.addAction('Удалить', self.delete)  # Добавляем действие "Удалить"
+        menu.exec_(self.mapToGlobal(position))  # Показываем меню в глобальных координатах
 
     def open(self):
-        if os.path.exists(self.filePath):
+        if os.path.exists(self.filePath):  # Проверяем существование файла
             print(f"Открытие файла {self.text()}...")
         else:
-            QMessageBox.warning(self, "Ошибка", f"Файл {self.text()} не найден!")
+            QMessageBox.warning(self, "Ошибка", f"Файл {self.text()} не найден!")  # Показываем предупреждение, если файл не найден
 
     def rename(self):
-        newName, ok = QInputDialog.getText(self, 'Переименовать иконку', 'Введите новое имя:')
+        newName, ok = QInputDialog.getText(self, 'Переименовать иконку', 'Введите новое имя:')  # Запрашиваем новое имя
         if ok and newName:
-            self.setText(newName)
+            self.setText(newName)  # Устанавливаем новое имя иконки
 
     def delete(self):
-        if os.path.exists(self.filePath):
+        if os.path.exists(self.filePath):  # Проверяем существование файла
             reply = QMessageBox.question(self, 'Удалить файл',
                                          f"Вы уверены, что хотите удалить файл {self.text()}?",
-                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)  # Запрашиваем подтверждение на удаление
             if reply == QMessageBox.Yes:
                 try:
-                    os.remove(self.filePath)
-                    self.deleteLater()
-                    QMessageBox.information(self, "Успех", f"Файл {self.text()} успешно удален!")
+                    os.remove(self.filePath)  # Пытаемся удалить файл
+                    self.deleteLater()  # Удаляем иконку
+                    QMessageBox.information(self, "Успех", f"Файл {self.text()} успешно удален!")  # Показываем сообщение об успешном удалении
                 except Exception as e:
-                    QMessageBox.warning(self, "Ошибка", f"Не удалось удалить файл: {e}")
+                    QMessageBox.warning(self, "Ошибка", f"Не удалось удалить файл: {e}")  # Показываем сообщение об ошибке, если не удалось удалить файл
         else:
             reply = QMessageBox.question(self, 'Удалить иконку',
                                          f"Файл {self.text()} не найден. Удалить иконку?",
-                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)  # Запрашиваем подтверждение на удаление иконки
             if reply == QMessageBox.Yes:
-                self.deleteLater()
+                self.deleteLater()  # Удаляем иконку
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            self.oldPos = event.globalPos()
+            self.oldPos = event.globalPos()  # Сохраняем позицию мыши при нажатии
 
     def mouseMoveEvent(self, event):
         if event.buttons() == Qt.LeftButton:
-            delta = QPoint(event.globalPos() - self.oldPos)
-            self.move(self.x() + delta.x(), self.y() + delta.y())
-            self.oldPos = event.globalPos()
+            delta = QPoint(event.globalPos() - self.oldPos)  # Вычисляем изменение позиции
+            self.move(self.x() + delta.x(), self.y() + delta.y())  # Перемещаем иконку
+            self.oldPos = event.globalPos()  # Обновляем позицию мыши
 
     def mouseReleaseEvent(self, event):
         parent = self.parent()
         while parent and not isinstance(parent, Desktop):
-            parent = parent.parent()
+            parent = parent.parent()  # Находим рабочий стол в иерархии родительских виджетов
         if parent:
             for folder in parent.folders:
                 if folder and not sip.isdeleted(folder):
                     if folder.geometry().adjusted(-20, -20, 20, 20).contains(self.geometry().center()):
-                        folder.addIcon(self)
+                        folder.addIcon(self)  # Добавляем иконку в папку, если она находится в пределах ее области
                         return
 
     def getIconState(self):
@@ -77,13 +78,13 @@ class DesktopIcon(QPushButton):
             'name': self.text(),
             'filePath': self.filePath,
             'position': (self.x(), self.y())
-        }
+        }  # Возвращаем состояние иконки для сохранения
 
 class FolderWindow(QWidget):
     def __init__(self, folder, parent=None):
         super().__init__(parent)
-        self.setWindowTitle(f'Папка: {folder.text()}')
-        self.setGeometry(300, 300, 600, 400)
+        self.setWindowTitle(f'Папка: {folder.text()}')  # Устанавливаем заголовок окна папки
+        self.setGeometry(300, 300, 600, 400)  # Устанавливаем размеры и положение окна
         layout = QVBoxLayout(self)
         self.folder = folder
 
@@ -102,8 +103,9 @@ class FolderWindow(QWidget):
 
     def closeEvent(self, event):
         for item in self.iconLayout.children():
-            item.setParent(self.folder)
+            item.setParent(self.folder)  # Возвращаем иконки в родительскую папку
             item.hide()
+        super().closeEvent(event)  # Вызываем базовый метод
 
 class DesktopFolder(QPushButton):
     def __init__(self, name, position, parent=None):
@@ -112,47 +114,47 @@ class DesktopFolder(QPushButton):
         self.move(position)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.openMenu)
-        self.icons = []
+        self.icons = []  # Список иконок в папке
         self.oldPos = self.pos()
 
     def openMenu(self, position):
-        menu = QMenu()
-        menu.addAction('Открыть', self.openFolder)
-        menu.addAction('Переименовать', self.rename)
-        menu.addAction('Удалить', self.delete)
-        menu.exec_(self.mapToGlobal(position))
+        menu = QMenu()  # Создаем контекстное меню
+        menu.addAction('Открыть', self.openFolder)  # Добавляем действие "Открыть"
+        menu.addAction('Переименовать', self.rename)  # Добавляем действие "Переименовать"
+        menu.addAction('Удалить', self.delete)  # Добавляем действие "Удалить"
+        menu.exec_(self.mapToGlobal(position))  # Показываем меню в глобальных координатах
 
     def openFolder(self):
-        self.folderWindow = FolderWindow(self, self.parent())
+        self.folderWindow = FolderWindow(self, self.parent())  # Создаем и показываем окно папки
         self.folderWindow.show()
 
     def rename(self):
-        newName, ok = QInputDialog.getText(self, 'Переименовать папку', 'Введите новое имя:')
+        newName, ok = QInputDialog.getText(self, 'Переименовать папку', 'Введите новое имя:')  # Запрашиваем новое имя папки
         if ok and newName:
-            self.setText(newName)
+            self.setText(newName)  # Устанавливаем новое имя папки
 
     def delete(self):
         reply = QMessageBox.question(self, 'Удалить папку',
                                      f"Вы уверены, что хотите удалить папку {self.text()}?",
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)  # Запрашиваем подтверждение на удаление папки
         if reply == QMessageBox.Yes:
             for icon in self.icons:
-                icon.deleteLater()
-            self.deleteLater()
-            QMessageBox.information(self, "Успех", f"Папка {self.text()} успешно удалена!")
+                icon.deleteLater()  # Удаляем все иконки в папке
+            self.deleteLater()  # Удаляем папку
+            QMessageBox.information(self, "Успех", f"Папка {self.text()} успешно удалена!")  # Показываем сообщение об успешном удалении
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            self.oldPos = event.globalPos()
+            self.oldPos = event.globalPos()  # Сохраняем позицию мыши при нажатии
 
     def mouseMoveEvent(self, event):
         if event.buttons() == Qt.LeftButton:
-            delta = QPoint(event.globalPos() - self.oldPos)
-            self.move(self.x() + delta.x(), self.y() + delta.y())
-            self.oldPos = event.globalPos()
+            delta = QPoint(event.globalPos() - self.oldPos)  # Вычисляем изменение позиции
+            self.move(self.x() + delta.x(), self.y() + delta.y())  # Перемещаем папку
+            self.oldPos = event.globalPos()  # Обновляем позицию мыши
 
     def addIcon(self, icon):
-        self.icons.append(icon)
+        self.icons.append(icon)  # Добавляем иконку в папку
         icon.hide()
 
     def getFolderState(self):
@@ -160,27 +162,28 @@ class DesktopFolder(QPushButton):
             'name': self.text(),
             'position': (self.x(), self.y()),
             'icons': [icon.getIconState() for icon in self.icons if icon and not sip.isdeleted(icon)]
-        }
+        }  # Возвращаем состояние папки для сохранения
 
 class Desktop(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.icons = []
         self.folders = []
-        self.setupIcons()
+        self.setupIcons()  # Настраиваем иконки
 
         self.taskbar = QWidget(self)
         self.taskbar.setFixedHeight(40)
-        self.taskbar.setStyleSheet("background-color: darkblue; border-top: 2px solid black;")
+        
+        # Устанавливаем стиль панели задач
 
         startBtn = QPushButton('Пуск', self.taskbar)
         startBtn.setFixedSize(100, 30)
 
         startMenu = QMenu(self)
-        startMenu.addAction('Создать иконку', self.createIcon)
-        startMenu.addAction('Создать папку', self.createFolder)
+        startMenu.addAction('Создать иконку', self.createIcon)  # Добавляем действие "Создать иконку"
+        startMenu.addAction('Создать папку', self.createFolder)  # Добавляем действие "Создать папку"
 
-        startBtn.clicked.connect(lambda: self.showStartMenu(startMenu, startBtn))
+        startBtn.clicked.connect(lambda: self.showStartMenu(startMenu, startBtn))  # Подключаем кнопку "Пуск" к меню
 
         hbox = QHBoxLayout(self.taskbar)
         hbox.addWidget(startBtn)
@@ -194,7 +197,7 @@ class Desktop(QWidget):
         self.setLayout(vbox)
 
     def showStartMenu(self, menu, button):
-        menu.exec_(button.mapToGlobal(button.rect().bottomLeft()))
+        menu.exec_(button.mapToGlobal(button.rect().bottomLeft()))  # Показываем меню "Пуск" в глобальных координатах
 
     def setupIcons(self):
         if os.path.exists('desktop_state.json'):
@@ -206,37 +209,37 @@ class Desktop(QWidget):
                     for iconData in folderData.get('icons', []):
                         existing_icon = next((icon for icon in self.icons if icon.filePath == iconData['filePath']), None)
                         if existing_icon:
-                            folder.addIcon(existing_icon)
+                            folder.addIcon(existing_icon)  # Добавляем существующую иконку в папку
                         else:
                             icon = self.createDesktopIcon(iconData['name'], iconData['filePath'], QPoint(*iconData['position']))
-                            folder.addIcon(icon)
+                            folder.addIcon(icon)  # Создаем новую иконку и добавляем ее в папку
 
                 for iconData in data.get('icons', []):
                     existing_icon = next((icon for icon in self.icons if icon.filePath == iconData['filePath']), None)
                     if not existing_icon:
-                        self.createDesktopIcon(iconData['name'], iconData['filePath'], QPoint(*iconData['position']))
+                        self.createDesktopIcon(iconData['name'], iconData['filePath'], QPoint(*iconData['position']))  # Создаем иконку, если ее еще нет
 
     def createDesktopIcon(self, name, filePath, position=QPoint(50, 50)):
         icon = DesktopIcon(name, filePath, position, self)
         icon.show()
-        self.icons.append(icon)
+        self.icons.append(icon)  # Добавляем иконку на рабочий стол
         return icon
 
     def createDesktopFolder(self, name, position=QPoint(50, 50)):
         folder = DesktopFolder(name, position, self)
         folder.show()
-        self.folders.append(folder)
+        self.folders.append(folder)  # Добавляем папку на рабочий стол
         return folder
 
     def createIcon(self):
-        name, ok = QInputDialog.getText(self, 'Создать иконку', 'Введите имя иконки:')
+        name, ok = QInputDialog.getText(self, 'Создать иконку', 'Введите имя иконки:')  # Запрашиваем имя новой иконки
         if ok and name:
-            self.createDesktopIcon(name, '', QPoint(50, 50))
+            self.createDesktopIcon(name, '', QPoint(50, 50))  # Создаем новую иконку
 
     def createFolder(self):
-        name, ok = QInputDialog.getText(self, 'Создать папку', 'Введите имя папки:')
+        name, ok = QInputDialog.getText(self, 'Создать папку', 'Введите имя папки:')  # Запрашиваем имя новой папки
         if ok and name:
-            self.createDesktopFolder(name, QPoint(50, 50))
+            self.createDesktopFolder(name, QPoint(50, 50))  # Создаем новую папку
 
     def closeEvent(self, event):
         data = {
@@ -244,5 +247,5 @@ class Desktop(QWidget):
             'folders': [folder.getFolderState() for folder in self.folders if folder and not sip.isdeleted(folder)]
         }
         with open('desktop_state.json', 'w') as f:
-            json.dump(data, f, indent=4)
-        super().closeEvent(event)
+            json.dump(data, f, indent=4)  # Сохраняем состояние рабочего стола в файл
+        super().closeEvent(event)  # Вызываем базовый метод
