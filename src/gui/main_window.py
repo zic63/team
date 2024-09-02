@@ -1,72 +1,67 @@
 import sys
-import os
-from PyQt5.QtWidgets import QMainWindow, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QMenu, QFileDialog, QMessageBox, QInputDialog
+from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QSplitter, QAction, QMenuBar, QApplication
 from PyQt5.QtCore import Qt
+from gui.desktop_files import Desktop as FilesDesktop
+from gui.desktop_player import MediaPlayer
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.initUI()  # Инициализация пользовательского интерфейса
+        self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('Симулятор Windows 98')  # Устанавливаем заголовок окна
-        self.setGeometry(300, 300, 800, 600)  # Задаем размеры и положение окна
+        self.setWindowTitle('Симулятор Windows 98')
+        self.setGeometry(300, 300, 1600, 600)
 
-        self.centralWidget = QWidget(self)
-        self.setCentralWidget(self.centralWidget)
-        self.mainLayout = QVBoxLayout(self.centralWidget)  # Основной макет окна
+        self.splitter = QSplitter(Qt.Horizontal)
+        self.setCentralWidget(self.splitter)
 
-        self.setupDesktop()  # Настраиваем рабочий стол
-        self.setupTaskbar()  # Настраиваем панель задач
+        self.filesPanel = self.createFilesPanel()
+        self.playerPanel = self.createPlayerPanel()
 
-    def setupTaskbar(self):
-        # Настройка панели задач
-        self.taskbar = QWidget(self)
-        self.taskbar.setFixedHeight(40)  # Фиксируем высоту панели задач
-        self.taskbar.setStyleSheet("background-color: grey")  # Устанавливаем цвет панели задач
+        self.splitter.addWidget(self.filesPanel)
+        self.splitter.addWidget(self.playerPanel)
 
-        self.startBtn = QPushButton('Пуск', self.taskbar)
-        self.startBtn.setFixedSize(100, 30)  # Фиксируем размер кнопки "Пуск"
-        self.startBtn.clicked.connect(self.showStartMenu)  # Подключаем кнопку к методу открытия меню "Пуск"
+        self.splitter.setSizes([800, 800])
 
-        hbox = QHBoxLayout(self.taskbar)
-        hbox.addWidget(self.startBtn)  # Добавляем кнопку "Пуск" на панель задач
-        hbox.addStretch(1)  # Заполняем оставшееся пространство
-        hbox.setContentsMargins(5, 5, 5, 5)  # Устанавливаем отступы внутри панели задач
+        menubar = self.menuBar()
+        viewMenu = menubar.addMenu('View')
 
-        self.mainLayout.addWidget(self.taskbar)  # Добавляем панель задач в основной макет
+        self.toggleFilesAction = QAction('Show Files Panel', self, checkable=True, checked=True)
+        self.toggleFilesAction.triggered.connect(self.toggleFilesPanel)
+        viewMenu.addAction(self.toggleFilesAction)
 
-        self.startMenu = QMenu(self)
-        self.startMenu.addAction('Создать иконку', self.createIcon)  # Добавляем пункт меню "Создать иконку"
-        self.startMenu.addAction('Создать папку', self.createFolder)  # Добавляем пункт меню "Создать папку"
+        self.togglePlayerAction = QAction('Show Media Player', self, checkable=True, checked=True)
+        self.togglePlayerAction.triggered.connect(self.togglePlayerPanel)
+        viewMenu.addAction(self.togglePlayerAction)
 
-    def showStartMenu(self):
-        # Метод для отображения меню "Пуск"
-        self.startMenu.exec_(self.startBtn.mapToGlobal(self.startBtn.rect().bottomLeft()))
+    def createFilesPanel(self):
+        panel = QWidget()
+        panelLayout = QVBoxLayout(panel)
+        panel.setStyleSheet("border: 2px solid blue;")
 
-    def createIcon(self):
-        # Метод для создания новой иконки на рабочем столе
-        fileName, _ = QFileDialog.getOpenFileName(self, "Выберите файл для создания иконки", "", "Все файлы (*)")
-        if fileName:
-            iconName = os.path.basename(fileName)
-            self.desktop.createDesktopIcon(iconName, fileName)
+        desktop = FilesDesktop(panel)
+        desktop.setStyleSheet("background-color: lightblue;")
+        panelLayout.addWidget(desktop)
 
-    def createFolder(self):
-        # Метод для создания новой папки на рабочем столе
-        folderName, ok = QInputDialog.getText(self, 'Создать папку', 'Введите имя папки:')
-        if ok and folderName:
-            self.desktop.createDesktopFolder(folderName)
+        return panel
 
-    def setupDesktop(self):
-        # Настройка рабочего стола
-        from gui.desktop import Desktop
-        self.desktop = Desktop(self)
-        self.mainLayout.addWidget(self.desktop)  # Добавляем рабочий стол в основной макет
+    def createPlayerPanel(self):
+        panel = QWidget()
+        panelLayout = QVBoxLayout(panel)
+        panel.setStyleSheet("border: 2px solid green;")
 
-    def closeEvent(self, event):
-        # Сохраняем состояние иконок при закрытии приложения
-        self.desktop.saveDesktopState()
-        event.accept()
+        player = MediaPlayer()
+        player.setStyleSheet("background-color: lightgreen;")
+        panelLayout.addWidget(player)
+
+        return panel
+
+    def toggleFilesPanel(self):
+        self.filesPanel.setVisible(self.toggleFilesAction.isChecked())
+
+    def togglePlayerPanel(self):
+        self.playerPanel.setVisible(self.togglePlayerAction.isChecked())
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

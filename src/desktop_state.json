@@ -1,55 +1,13 @@
 {
     "icons": [
         {
-            "name": "\u041d\u043e\u0432\u044b\u0439 \u0442\u043e\u0447\u0435\u0447\u043d\u044b\u0439 \u0440\u0438\u0441\u0443\u043d\u043e\u043a.bmp",
-            "filePath": "C:/Users/PC Nutzer/Documents/GitHub/team/src/\u041d\u043e\u0432\u044b\u0439 \u0442\u043e\u0447\u0435\u0447\u043d\u044b\u0439 \u0440\u0438\u0441\u0443\u043d\u043e\u043a.bmp",
+            "name": "\u041d\u043e\u0432\u044b\u0439 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442 \u0432 \u0444\u043e\u0440\u043c\u0430\u0442\u0435 RTF.rtf",
+            "filePath": "C:/Users/PC Nutzer/Documents/GitHub/team/src/\u041d\u043e\u0432\u044b\u0439 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442 \u0432 \u0444\u043e\u0440\u043c\u0430\u0442\u0435 RTF.rtf",
             "position": [
-                13,
-                278
-            ]
-        },
-        {
-            "name": "\u043a\u0443\u043a\u0443",
-            "filePath": "C:/Users/PC Nutzer/Documents/GitHub/team/src/\u041d\u043e\u0432\u044b\u0439 \u0442\u043e\u0447\u0435\u0447\u043d\u044b\u0439 \u0440\u0438\u0441\u0443\u043d\u043e\u043a.bmp",
-            "position": [
-                826,
-                601
-            ]
-        },
-        {
-            "name": "\u041d\u043e\u0432\u044b\u0439 \u0442\u043e\u0447\u0435\u0447\u043d\u044b\u0439 \u0440\u0438\u0441\u0443\u043d\u043e\u043a.bmp",
-            "filePath": "C:/Users/PC Nutzer/Documents/GitHub/team/src/\u041d\u043e\u0432\u044b\u0439 \u0442\u043e\u0447\u0435\u0447\u043d\u044b\u0439 \u0440\u0438\u0441\u0443\u043d\u043e\u043a.bmp",
-            "position": [
-                13,
-                337
+                299,
+                266
             ]
         }
     ],
-    "folders": [
-        {
-            "name": "\u0425\u0443\u044f\u043f\u043a\u0430",
-            "position": [
-                351,
-                380
-            ],
-            "icons": [
-                {
-                    "name": "\u041d\u043e\u0432\u044b\u0439 \u0442\u043e\u0447\u0435\u0447\u043d\u044b\u0439 \u0440\u0438\u0441\u0443\u043d\u043e\u043a.bmp",
-                    "filePath": "C:/Users/PC Nutzer/Documents/GitHub/team/src/\u041d\u043e\u0432\u044b\u0439 \u0442\u043e\u0447\u0435\u0447\u043d\u044b\u0439 \u0440\u0438\u0441\u0443\u043d\u043e\u043a.bmp",
-                    "position": [
-                        13,
-                        278
-                    ]
-                },
-                {
-                    "name": "\u041d\u043e\u0432\u044b\u0439 \u0442\u043e\u0447\u0435\u0447\u043d\u044b\u0439 \u0440\u0438\u0441\u0443\u043d\u043e\u043a.bmp",
-                    "filePath": "C:/Users/PC Nutzer/Documents/GitHub/team/src/\u041d\u043e\u0432\u044b\u0439 \u0442\u043e\u0447\u0435\u0447\u043d\u044b\u0439 \u0440\u0438\u0441\u0443\u043d\u043e\u043a.bmp",
-                    "position": [
-                        13,
-                        337
-                    ]
-                }
-            ]
-        }
-    ]
+    "folders": []
 }
