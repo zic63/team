@@ -176,7 +176,7 @@ class Desktop(QWidget):
         
         # Устанавливаем стиль панели задач
 
-        startBtn = QPushButton('Пуск', self.taskbar)
+        startBtn = QPushButton('Поехали!', self.taskbar)
         startBtn.setFixedSize(100, 30)
 
         startMenu = QMenu(self)

@@ -1,14 +1,17 @@
 import sys
-import json
-from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QSplitter, QAction, QMenuBar, QApplication
+from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QSplitter, QAction, QMenuBar, QApplication, QFileDialog
 from PyQt5.QtCore import Qt
 from gui.desktop_files import Desktop as FilesDesktop
 from gui.desktop_player import MediaPlayer
-from gui.timeline import Timeline  # Импортируем Timeline из timeline.py
+from gui.timeline import Timeline
+from settings.desktop_settings import DesktopSettings
+from project_file import ProjectFile
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.settings = DesktopSettings()  # Создаем объект для работы с настройками
+        self.project_file = ProjectFile()  # Создаем объект для работы с файлами проекта
         self.initUI()  # Инициализация пользовательского интерфейса
 
     def initUI(self):
@@ -40,21 +43,41 @@ class MainWindow(QMainWindow):
 
         # Создаем меню и действия для управления видимостью панелей
         menubar = self.menuBar()
+        fileMenu = menubar.addMenu('File')
+
+        self.newProjectAction = QAction('New Project', self)
+        self.newProjectAction.triggered.connect(self.createNewProject)
+        fileMenu.addAction(self.newProjectAction)
+
+        self.openProjectAction = QAction('Open Project', self)
+        self.openProjectAction.triggered.connect(self.openProject)
+        fileMenu.addAction(self.openProjectAction)
+
         viewMenu = menubar.addMenu('View')
 
         self.toggleFilesAction = QAction('Show Files Panel', self, checkable=True, checked=True)
-        self.toggleFilesAction.triggered.connect(self.toggleFilesPanel)
+        self.toggleFilesAction.triggered.connect(self.settings.toggleFilesPanel)
         viewMenu.addAction(self.toggleFilesAction)
 
         self.togglePlayerAction = QAction('Show Media Player', self, checkable=True, checked=True)
-        self.togglePlayerAction.triggered.connect(self.togglePlayerPanel)
+        self.togglePlayerAction.triggered.connect(self.settings.togglePlayerPanel)
         viewMenu.addAction(self.togglePlayerAction)
 
         self.toggleTimelineAction = QAction('Show Timeline', self, checkable=True, checked=True)
-        self.toggleTimelineAction.triggered.connect(self.toggleTimelinePanel)
+        self.toggleTimelineAction.triggered.connect(self.settings.toggleTimelinePanel)
         viewMenu.addAction(self.toggleTimelineAction)
 
-        self.loadSettings()  # Загружаем настройки при инициализации
+        # Передаем действия и панели в DesktopSettings
+        self.settings.set_actions_and_panels(
+            self.toggleFilesAction,
+            self.togglePlayerAction,
+            self.toggleTimelineAction,
+            self.filesPanel,
+            self.playerPanel,
+            self.timeline
+        )
+
+        self.settings.load_settings()  # Загружаем настройки при инициализации
 
     def createFilesPanel(self):
         panel = QWidget()
@@ -80,49 +103,24 @@ class MainWindow(QMainWindow):
 
         return panel
 
-    def toggleFilesPanel(self):
-        """Переключает видимость панели файлов."""
-        self.filesPanel.setVisible(self.toggleFilesAction.isChecked())
+    def createNewProject(self):
+        """Создает новый проект."""
+        file_name, _ = QFileDialog.getSaveFileName(self, 'Save Project File', '', 'Project Files (*.proj)')
+        if file_name:
+            self.project_file.create(file_name)
+            # Можно добавить логику для очистки текущего проекта или начальной настройки нового проекта
 
-    def togglePlayerPanel(self):
-        """Переключает видимость панели медиаплеера."""
-        self.playerPanel.setVisible(self.togglePlayerAction.isChecked())
-
-    def toggleTimelinePanel(self):
-        """Переключает видимость таймлайна."""
-        self.timeline.setVisible(self.toggleTimelineAction.isChecked())
+    def openProject(self):
+        """Открывает существующий проект."""
+        file_name, _ = QFileDialog.getOpenFileName(self, 'Open Project File', '', 'Project Files (*.proj)')
+        if file_name:
+            project_data = self.project_file.load(file_name)
+            # Логика для загрузки данных проекта в интерфейс
 
     def closeEvent(self, event):
-        """Сохраняет настройки при закрытии окна."""
-        self.saveSettings()
+        """Передает событие закрытия в DesktopSettings."""
+        self.settings.save_settings()  # Сохраняем настройки при закрытии
         super().closeEvent(event)
-
-    def saveSettings(self):
-        """Сохраняет состояние видимости панелей и таймлайна в файл settings.json."""
-        settings = {
-            'filesPanel': self.toggleFilesAction.isChecked(),
-            'playerPanel': self.togglePlayerAction.isChecked(),
-            'timeline': self.toggleTimelineAction.isChecked(),
-        }
-        with open('settings.json', 'w') as f:
-            json.dump(settings, f, indent=4)
-
-    def loadSettings(self):
-        """Загружает настройки видимости панелей и таймлайна из файла settings.json."""
-        try:
-            with open('settings.json', 'r') as f:
-                settings = json.load(f)
-                self.toggleFilesAction.setChecked(settings.get('filesPanel', True))
-                self.togglePlayerAction.setChecked(settings.get('playerPanel', True))
-                self.toggleTimelineAction.setChecked(settings.get('timeline', True))
-
-                # Устанавливаем видимость панелей и таймлайна в соответствии с сохраненными настройками
-                self.toggleFilesPanel()
-                self.togglePlayerPanel()
-                self.toggleTimelinePanel()
-        except FileNotFoundError:
-            # Если файл настроек не найден, используем значения по умолчанию
-            pass
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

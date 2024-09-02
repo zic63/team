@@ -22,8 +22,8 @@ class Timeline(QWidget):
 
         # Создаем макет для виджета содержимого
         self.contentLayout = QHBoxLayout(self.contentWidget)
-        self.contentLayout.setContentsMargins(0, 0, 0, 0)
-        self.contentLayout.setSpacing(10)
+        self.contentLayout.setContentsMargins(5, 5, 5, 5)
+        self.contentLayout.setSpacing(5)
 
         # Добавляем виджеты-клипы (пример)
         for i in range(10):
